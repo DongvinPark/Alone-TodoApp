@@ -14,7 +14,7 @@ import javax.persistence.Table;
 @RequiredArgsConstructor
 @Entity
 @Builder
-@NoArgsConstructor
+//@NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "TodoReply")
 public class TodoReplyEntity {
