@@ -1,6 +1,7 @@
 package AloneTodoApp.demo.service;
 
 import AloneTodoApp.demo.model.TodoEntity;
+import AloneTodoApp.demo.persistence.TodoReplyRepository;
 import AloneTodoApp.demo.persistence.TodoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,8 @@ public class TestTodoService {
     @Autowired
     private TodoRepository repository;
 
-
+    @Autowired
+    private TodoReplyRepository replyRepository;
 
     public List<TodoEntity> retrieve(String userId) {
         return repository.findByUserId(userId);

@@ -22,7 +22,7 @@ public class TodoReplyEntity {
     @Id
     @GeneratedValue(generator="system-uuid")
     @GenericGenerator(name="system-uuid", strategy="uuid")
-    private String id; //ID of this object. DB 내에서 주키 역할을 한다.
+    private String id; //ID of this object. 릴레이션 내에서 주키 역할을 한다.
 
     private String userId;// ID of user who created this reply. 이게 있어야 내가 작성한 답글만을 볼 수 있다.
 
