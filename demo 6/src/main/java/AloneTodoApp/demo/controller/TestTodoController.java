@@ -2,6 +2,7 @@ package AloneTodoApp.demo.controller;
 
 import AloneTodoApp.demo.dto.ResponseDTO;
 import AloneTodoApp.demo.dto.TodoDTO;
+import AloneTodoApp.demo.dto.TodoReplyDTO;
 import AloneTodoApp.demo.model.TodoEntity;
 import AloneTodoApp.demo.model.TodoReplyEntity;
 import AloneTodoApp.demo.service.TestTodoReplyService;
@@ -26,14 +27,13 @@ public class TestTodoController {
     private TestTodoReplyService replyService;
 
 
-    @GetMapping
+
+    @GetMapping("/getTodo")
     public ResponseEntity<?> getTodoLists(){
 
         String tempUserId = "temporary-user"; //for TEST
 
         List<TodoEntity> toDoEntities = service.retrieve(tempUserId);
-        //TodoService 쪽의 retrieve 메서드를 고칠 필요는 없다. 어차피 내가 각각의 TodoEntity에 리플라이 리스트를 추가해 줘야 하기 때문이다.
-        // todo 엔티티를 하나 찾을 때마다 그 엔티티에 대응되는 리플라이들도 붙여서 반환해야 하기 때문이다.
 
         List<TodoReplyEntity> replyEntities = replyService.retrieveReplies(tempUserId);
         log.info("리플라이엔티티 리스트 길이 보기 : " + replyEntities.size());
@@ -43,7 +43,7 @@ public class TestTodoController {
 
         List<TodoDTO> dtos = toDoEntities.stream().map(TodoDTO::new).collect(Collectors.toList());
 
-        extracted(replyEntities, dtos);
+        addReplies(replyEntities, dtos);
 
         ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
 
@@ -51,7 +51,9 @@ public class TestTodoController {
     }//func
 
 
-    @PostMapping
+
+
+    @PostMapping("/createTodo")
     public ResponseEntity<?> createTodo(@RequestBody TodoDTO todoDTO){
         try{
             String tempUserId = "temporary-user"; //for TEST
@@ -62,17 +64,13 @@ public class TestTodoController {
 
             entity.setUserId(tempUserId);
 
-            List<TodoEntity> toDoentities = service.create(entity);//TodoServece 쪽의 create 메서드를 수정해야 한다.
-            //이 메서드에서 todo 엔티티 하나 찾을 때마다, 그 엔티티에 대응되는 리플라이들도 붙여서 반환해야 하기 때문이다.
-            //그런데, 어차피 서비스 계층에서는 리포지토리가 기본제공하는 메서드밖에 사용하지 못한다.
-            //즉, 여기에서 List<TodoEntity> entities 가 만들어질 때, 중간에 리플라이들을 각 Todo 엔티티의 고유 아이디에 맞는 것으로 선별해서 맵핑해주는 작업을 한 수가 없다는 뜻이다.
+            List<TodoEntity> toDoentities = service.create(entity);
 
             List<TodoReplyEntity> replyEntities = replyService.retrieveReplies(tempUserId);
 
-            //그 맵핑 작업은 결국 여기서 해야 한다. 왜냐면 엔티티의 리스트를 그냥 반환하는 것이 아니라 여기에서 추가로 리프라이 리스트를 만들어서 반환해야 하니까.
             List<TodoDTO> dtos = toDoentities.stream().map(TodoDTO::new).collect(Collectors.toList());
 
-            extracted(replyEntities, dtos);
+            addReplies(replyEntities, dtos);
 
             ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
 
@@ -85,19 +83,16 @@ public class TestTodoController {
         }
     } //func
 
-    //한 개의 Todo 튜플의 DTO와 그 튜플의 고유 id 문자열을 입력으로 받아서 Reply를 만든다.
-    //그러면 이놈은 뭘 반환해야 하지?
-    // 현재 만든 리플라이만 반환하는 것이 아니라, 그 리플라이를 포함하고 있는 부모 todo 엔티티, 그리고 다른 todo 엔티티도 모두 같이 반환해야 하지 않나?
-    //결과적으로 이놈은 현재 TestTodoController클래스의 getTodoLists()메서드 동작을 똑같이 따라해야 한다!!
+
+
+
+
     @PostMapping("/makeReply")
-    public ResponseEntity<?> createTodoReply(
-            @RequestBody TodoDTO todoDTO
-    ){
+    public ResponseEntity<?> createTodoReply( @RequestBody TodoDTO todoDTO ){
         try{
             String tempUserId = "temporary-user"; //for TEST
-            //String parentTodoId = todoId;
-            //todoDTO.getReplies().size()-1 이 부분은 나중에 validation이 필요하다. todoDTO 내의 replies 리스트가 빈 리스트면 작동을 하지 않기 때문이다.
-            String title = todoDTO.getReplies().get(todoDTO.getReplies().size()-1);
+
+            String title = todoDTO.getReplies().get(todoDTO.getReplies().size()-1).getTitle();
 
             replyService.createReply(tempUserId, todoDTO.getId(), title);
 
@@ -110,9 +105,87 @@ public class TestTodoController {
         }
     }
 
-    //>>>>>>>>> Helper Methods Area <<<<<<<<<<<
 
-    private void extracted(List<TodoReplyEntity> replyEntities, List<TodoDTO> dtos) {
+
+
+    @PutMapping("/updateTodo")
+    public ResponseEntity<?> updateTodo(@RequestBody TodoDTO todoDTO){
+
+        String tempUserId = "temporary-user";
+
+        TodoEntity todoEntity = TodoDTO.toEntity(todoDTO);
+
+        todoEntity.setUserId(tempUserId);
+
+        List<TodoEntity> todoEntities = service.update(todoEntity);
+
+        List<TodoDTO> dtos = todoEntities.stream().map(TodoDTO::new).collect(Collectors.toList());
+
+        List<TodoReplyEntity> replyEntities = replyService.retrieveReplies(tempUserId);
+
+        addReplies(replyEntities, dtos);
+
+        ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
+
+        return ResponseEntity.ok().body(response);
+    }//func
+
+
+
+
+    @PutMapping("/updateReply")
+    public ResponseEntity<?> updateReply(@RequestBody TodoReplyDTO todoReplyDTO){
+
+        /*
+        * 로직을 좀 세워보자. 이놈은 특정한 Todo 튜플 하나에 존재하는 TodoReply 항목중 하나만을 딱 찍어서 타이틀을 수정하는 것이다.
+        * 프런트 엔드에서 무엇을 입력으로 받아야 하지? 결국 딱 찍어서 수정하고자 하는 TodoReply하나만 있으면 된다.
+        * 그래서 최종적으로 무엇을 유저에게 리턴해야 하지? >>> 결과물은 결국 getTodo의 결과물과 일치해야 한다!!
+        * */
+
+        String tempUserId = "temporary-user";
+
+        TodoReplyEntity replyEntity = TodoReplyDTO.toEntity(todoReplyDTO);
+
+        replyEntity.setUserId(tempUserId);
+
+        List<TodoReplyEntity> listOfRepliesAfterUpdate = replyService.updateReply(replyEntity);
+
+        List<TodoEntity> todoEntities = service.retrieve(tempUserId);
+
+        List<TodoDTO> dtos = todoEntities.stream().map(TodoDTO::new).collect(Collectors.toList());
+
+        addReplies(listOfRepliesAfterUpdate, dtos);
+
+        ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
+
+        return ResponseEntity.ok().body(response);
+    }//func
+
+
+
+
+    @DeleteMapping("/deleteTodo")
+    public ResponseEntity<?> deleteTodo(@RequestBody TodoDTO todoDTO){
+        return null;
+    }//func
+
+
+
+
+    @DeleteMapping("/deleteReply")
+    public ResponseEntity<?> deleteReply(@RequestBody TodoDTO todoDTO){
+        return null;
+    }//func
+
+
+
+    //************>>>>>>>>> HELPER METHOD AREA <<<<<<<<<<<************
+
+
+
+
+
+    private void addReplies(List<TodoReplyEntity> replyEntities, List<TodoDTO> dtos) {
         for(TodoDTO dto : dtos){
             for(TodoReplyEntity todoReplyEntity : replyEntities){
 
@@ -122,10 +195,10 @@ public class TestTodoController {
                 if(dto.getId().equals(todoReplyEntity.getParentTodoId())){
                     log.info("todoDTO에 리플라이 넣음");
                     log.info(todoReplyEntity.getParentTodoId());
-                    dto.getReplies().add(todoReplyEntity.getTitle());
+                    dto.getReplies().add(todoReplyEntity);
                 }
             }//inner for
         }//outer for
-    }
+    }//func
 
 }//end of class

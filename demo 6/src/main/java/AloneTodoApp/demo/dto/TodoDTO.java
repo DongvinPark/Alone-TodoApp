@@ -20,7 +20,7 @@ public class TodoDTO {
     private String title;
     private boolean done;
     private boolean isFailed;
-    private List<String> replies;
+    private List<TodoReplyEntity> replies;
 
     public TodoDTO(final TodoEntity entity) {
         this.id = entity.getId();
