@@ -1,6 +1,8 @@
 package AloneTodoApp.demo.service;
 
+import AloneTodoApp.demo.dto.TodoDTO;
 import AloneTodoApp.demo.model.TodoEntity;
+import AloneTodoApp.demo.model.TodoReplyEntity;
 import AloneTodoApp.demo.persistence.TodoReplyRepository;
 import AloneTodoApp.demo.persistence.TodoRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,9 @@ public class TestTodoService {
 
     @Autowired
     private TodoRepository repository;
+
+    @Autowired
+    private TodoReplyRepository replyRepository;
 
 
 
@@ -62,6 +67,23 @@ public class TestTodoService {
     }//func
 
 
+
+
+    @Transactional
+    public List<TodoEntity> delete(final TodoEntity todoEntity, TodoDTO todoDTO) {
+        try{
+            repository.delete(todoEntity);
+            for(TodoReplyEntity replyEntity : todoDTO.getReplies()){
+                replyRepository.delete(replyEntity);
+            }
+        }
+        catch(Exception e){
+            log.error("error deleting todo Entity", todoEntity.getId(), e);
+            throw new RuntimeException("error deleting entity" + todoEntity.getId());
+        }
+
+        return retrieve(todoEntity.getUserId());
+    }//func
 
 
     //************>>>>>>>>> HELPER METHOD AREA <<<<<<<<<<<************

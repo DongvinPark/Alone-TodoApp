@@ -56,4 +56,16 @@ public class TestTodoReplyService {
     }//func
 
 
+    public List<TodoReplyEntity> deleteReply(TodoReplyEntity replyEntity) {
+        try{
+                replyRepository.delete(replyEntity);
+        }
+        catch(Exception e){
+            log.error("error deleting Todo Reply Entity", replyEntity.getId(), e);
+            throw new RuntimeException("error deleting entity" + replyEntity.getId());
+        }
+
+        return retrieveReplies(replyEntity.getUserId());
+    }//func
+
 }//end of class

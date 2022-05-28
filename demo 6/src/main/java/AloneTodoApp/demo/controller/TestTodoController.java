@@ -164,17 +164,54 @@ public class TestTodoController {
 
 
 
+    //Todo 아이템이 사라지면, 그 아이템 밑에 존재하던 리플라이들도 전부 없애야 한다!!
+    //이것을 구현하는 로직을 Todo Service 계층의 delete 메서드에서 구현해야 한다.
     @DeleteMapping("/deleteTodo")
     public ResponseEntity<?> deleteTodo(@RequestBody TodoDTO todoDTO){
-        return null;
+
+        String tempUserId = "temporary-user";
+
+        TodoEntity todoEntity = TodoDTO.toEntity(todoDTO);
+
+        todoEntity.setUserId(tempUserId);
+
+        List<TodoEntity> todoEntities = service.delete(todoEntity, todoDTO);
+
+        List<TodoDTO> dtos = todoEntities.stream().map(TodoDTO::new).collect(Collectors.toList());
+
+        List<TodoReplyEntity> replyEntities = replyService.retrieveReplies(tempUserId);
+
+        addReplies(replyEntities, dtos);
+
+        ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
+
+        return ResponseEntity.ok().body(response);
     }//func
 
 
 
 
+    //이놈은 특정한 Todo 아이템에 속해 있는 특정한 리플라이 하나를 골라서 삭제하는 것이다.
     @DeleteMapping("/deleteReply")
-    public ResponseEntity<?> deleteReply(@RequestBody TodoDTO todoDTO){
-        return null;
+    public ResponseEntity<?> deleteReply(@RequestBody TodoReplyDTO todoReplyDTO){
+
+        String tempUserId = "temporary-user";
+
+        TodoReplyEntity replyEntity = TodoReplyDTO.toEntity(todoReplyDTO);
+
+        replyEntity.setUserId(tempUserId);
+
+        List<TodoReplyEntity> listOfRepliesAfterDelete = replyService.deleteReply(replyEntity);
+
+        List<TodoEntity> todoEntities = service.retrieve(tempUserId);
+
+        List<TodoDTO> dtos = todoEntities.stream().map(TodoDTO::new).collect(Collectors.toList());
+
+        addReplies(listOfRepliesAfterDelete, dtos);
+
+        ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
+
+        return ResponseEntity.ok().body(response);
     }//func
 
 
