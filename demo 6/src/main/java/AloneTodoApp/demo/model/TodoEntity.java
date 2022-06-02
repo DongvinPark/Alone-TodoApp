@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +37,7 @@ public class TodoEntity {
 
     private boolean isFailed;//현재 시각이 dead line 보다 큰 값일 경우 여기가 true되면서 Failed 처리 된다.
 
-    //private List<TodoReplyEntity> replies;
+    private LocalDate dueDate;
 
     @Override
     public boolean equals(Object o) {

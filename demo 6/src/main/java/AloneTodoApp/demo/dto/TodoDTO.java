@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +22,8 @@ public class TodoDTO {
     private boolean done;
     private boolean isFailed;
     private List<TodoReplyEntity> replies;
+    //프론트 엔드 쪽에서는 dueDate 부분을 백엔드에 넘겨줄 때, "2022-06-02"와 같은 스트링 타입 리터럴로 보내줘야 한다.
+    private String dueDate;
 
     public TodoDTO(final TodoEntity entity) {
         this.id = entity.getId();
@@ -38,7 +41,7 @@ public class TodoDTO {
                 .title(dto.getTitle())
                 .done(dto.isDone())
                 .isFailed(dto.isFailed())
-                //.replies(dto.getReplies())
+                .dueDate(LocalDate.parse(dto.getDueDate()))
                 .build();
     }
 }//end of TodoDTO class
