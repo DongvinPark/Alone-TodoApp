@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
-@RequestMapping("/testTodo")
+@RequestMapping("/Todo")
 public class TodoController {
 
     @Autowired
