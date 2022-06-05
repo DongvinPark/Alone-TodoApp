@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class TestTodoReplyService {
+public class TodoReplyService {
 
     @Autowired
     private TodoReplyRepository replyRepository;

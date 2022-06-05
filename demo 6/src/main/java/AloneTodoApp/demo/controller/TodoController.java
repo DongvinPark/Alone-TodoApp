@@ -5,8 +5,8 @@ import AloneTodoApp.demo.dto.TodoDTO;
 import AloneTodoApp.demo.dto.TodoReplyDTO;
 import AloneTodoApp.demo.model.TodoEntity;
 import AloneTodoApp.demo.model.TodoReplyEntity;
-import AloneTodoApp.demo.service.TestTodoReplyService;
-import AloneTodoApp.demo.service.TestTodoService;
+import AloneTodoApp.demo.service.TodoReplyService;
+import AloneTodoApp.demo.service.TodoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping("/testTodo")
-public class TestTodoController {
+public class TodoController {
 
     @Autowired
-    private TestTodoService service;
+    private TodoService service;
 
     @Autowired
-    private TestTodoReplyService replyService;
+    private TodoReplyService replyService;
 
 
 
