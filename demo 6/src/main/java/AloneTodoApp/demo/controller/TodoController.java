@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +43,7 @@ public class TodoController {
             log.info("리플라이 엔티티들의 parentTodoId 보기 : " + ret.getParentTodoId());
         }
 
-        List<TodoDTO> dtos = toDoEntities.stream().map(TodoDTO::new).collect(Collectors.toList());
+        List<TodoDTO> dtos = makeDtoListFromEntityList(toDoEntities);
 
         addReplies(replyEntities, dtos);
 
@@ -68,7 +70,7 @@ public class TodoController {
 
             List<TodoReplyEntity> replyEntities = replyService.retrieveReplies(tempUserId);
 
-            List<TodoDTO> dtos = toDoentities.stream().map(TodoDTO::new).collect(Collectors.toList());
+            List<TodoDTO> dtos = makeDtoListFromEntityList(toDoentities);
 
             addReplies(replyEntities, dtos);
 
@@ -119,7 +121,7 @@ public class TodoController {
 
         List<TodoEntity> todoEntities = service.update(todoEntity);
 
-        List<TodoDTO> dtos = todoEntities.stream().map(TodoDTO::new).collect(Collectors.toList());
+        List<TodoDTO> dtos = makeDtoListFromEntityList(todoEntities);
 
         List<TodoReplyEntity> replyEntities = replyService.retrieveReplies(tempUserId);
 
@@ -152,7 +154,7 @@ public class TodoController {
 
         List<TodoEntity> todoEntities = service.retrieve(tempUserId);
 
-        List<TodoDTO> dtos = todoEntities.stream().map(TodoDTO::new).collect(Collectors.toList());
+        List<TodoDTO> dtos = makeDtoListFromEntityList(todoEntities);
 
         addReplies(listOfRepliesAfterUpdate, dtos);
 
@@ -177,7 +179,7 @@ public class TodoController {
 
         List<TodoEntity> todoEntities = service.delete(todoEntity, todoDTO);
 
-        List<TodoDTO> dtos = todoEntities.stream().map(TodoDTO::new).collect(Collectors.toList());
+        List<TodoDTO> dtos = makeDtoListFromEntityList(todoEntities);
 
         List<TodoReplyEntity> replyEntities = replyService.retrieveReplies(tempUserId);
 
@@ -205,7 +207,7 @@ public class TodoController {
 
         List<TodoEntity> todoEntities = service.retrieve(tempUserId);
 
-        List<TodoDTO> dtos = todoEntities.stream().map(TodoDTO::new).collect(Collectors.toList());
+        List<TodoDTO> dtos = makeDtoListFromEntityList(todoEntities);
 
         addReplies(listOfRepliesAfterDelete, dtos);
 
@@ -237,5 +239,28 @@ public class TodoController {
             }//inner for
         }//outer for
     }//func
+
+
+
+
+
+    private List<TodoDTO> makeDtoListFromEntityList( List<TodoEntity> todoEntities ){
+        List<TodoDTO> todoDTOList = new ArrayList<>();
+
+        for(TodoEntity todoEntity : todoEntities){
+            TodoDTO todoDTO = TodoDTO.builder()
+                    .id(todoEntity.getId())
+                    .title(todoEntity.getTitle())
+                    .done(todoEntity.isDone())
+                    .isFailed(todoEntity.isFailed())
+                    .replies(new LinkedList<TodoReplyEntity>())
+                    .dueDate(String.valueOf(todoEntity.getDueDate()))
+                    .build();
+
+            todoDTOList.add(todoDTO);
+        }//for
+
+        return todoDTOList;
+    }
 
 }//end of class
