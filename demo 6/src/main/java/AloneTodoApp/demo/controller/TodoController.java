@@ -110,7 +110,7 @@ public class TodoController {
 
 
 
-    @PutMapping("/updateTodo") //여기에도 try-catch 써야 한다!!
+    @PutMapping("/updateTodo")
     public ResponseEntity<?> updateTodo(@RequestBody TodoDTO todoDTO){
         try {
             String tempUserId = "temporary-user";
@@ -150,23 +150,30 @@ public class TodoController {
         * 그래서 최종적으로 무엇을 유저에게 리턴해야 하지? >>> 결과물은 결국 getTodo의 결과물과 일치해야 한다!!
         * */
 
-        String tempUserId = "temporary-user";
+        try {
+            String tempUserId = "temporary-user";
 
-        TodoReplyEntity replyEntity = TodoReplyDTO.toEntity(todoReplyDTO);
+            TodoReplyEntity replyEntity = TodoReplyDTO.toEntity(todoReplyDTO);
 
-        replyEntity.setUserId(tempUserId);
+            replyEntity.setUserId(tempUserId);
 
-        List<TodoReplyEntity> listOfRepliesAfterUpdate = replyService.updateReply(replyEntity);
+            List<TodoReplyEntity> listOfRepliesAfterUpdate = replyService.updateReply(replyEntity);
 
-        List<TodoEntity> todoEntities = service.retrieve(tempUserId);
+            List<TodoEntity> todoEntities = service.retrieve(tempUserId);
 
-        List<TodoDTO> dtos = makeDtoListFromEntityList(todoEntities);
+            List<TodoDTO> dtos = makeDtoListFromEntityList(todoEntities);
 
-        addReplies(listOfRepliesAfterUpdate, dtos);
+            addReplies(listOfRepliesAfterUpdate, dtos);
 
-        ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
+            ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
 
-        return ResponseEntity.ok().body(response);
+            return ResponseEntity.ok().body(response);
+        }
+        catch (Exception e) {
+            String error = e.getMessage();
+            ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().error(error).build();
+            return ResponseEntity.badRequest().body(response);
+        }
     }//func
 
 

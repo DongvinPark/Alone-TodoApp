@@ -1,5 +1,6 @@
 package AloneTodoApp.demo.service;
 
+import AloneTodoApp.demo.Exception.AloneTodoAppException;
 import AloneTodoApp.demo.model.TodoReplyEntity;
 import AloneTodoApp.demo.persistence.TodoReplyRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+
+import static AloneTodoApp.demo.Exception.AloneTodoErrorCode.NO_TITLE_ENTERED;
 
 @Slf4j
 @Service
@@ -32,6 +35,10 @@ public class TodoReplyService {
     @Transactional
     public void createReply(String tempUserId, String todoId, String title) {
 
+        if(title.equals("") || title == null){
+            throw new AloneTodoAppException(NO_TITLE_ENTERED);
+        }
+
         TodoReplyEntity replyEntity = new TodoReplyEntity(null, tempUserId, todoId, title);
 
         replyRepository.save(replyEntity);
@@ -43,6 +50,8 @@ public class TodoReplyService {
 
     @Transactional
     public List<TodoReplyEntity> updateReply(TodoReplyEntity replyEntity){
+
+        validateEmptyTodoReplyTile(replyEntity);
 
         Optional<TodoReplyEntity> original = replyRepository.findById(replyEntity.getId());
 
@@ -56,6 +65,8 @@ public class TodoReplyService {
     }//func
 
 
+
+
     public List<TodoReplyEntity> deleteReply(TodoReplyEntity replyEntity) {
         try{
                 replyRepository.delete(replyEntity);
@@ -67,5 +78,20 @@ public class TodoReplyService {
 
         return retrieveReplies(replyEntity.getUserId());
     }//func
+
+
+
+    //************>>>>>>>>> HELPER METHOD AREA <<<<<<<<<<<************
+
+
+
+
+    private void validateEmptyTodoReplyTile(TodoReplyEntity replyEntity){
+        if(replyEntity.getTitle().equals("") || replyEntity.getTitle() == null){
+            throw new AloneTodoAppException(NO_TITLE_ENTERED);
+        }
+    }//func
+
+
 
 }//end of class
