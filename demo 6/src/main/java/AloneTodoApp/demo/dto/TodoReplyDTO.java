@@ -1,6 +1,7 @@
 package AloneTodoApp.demo.dto;
 
 import AloneTodoApp.demo.model.TodoReplyEntity;
+import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,8 +14,13 @@ import lombok.NoArgsConstructor;
 public class TodoReplyDTO {
 
     private String id; //ID of this object. 릴레이션 내에서 주키 역할을 한다.
+
     private String userId;// ID of user who created this reply. 이게 있어야 내가 작성한 답글만을 볼 수 있다.
+
+    @NotNull
     private String parentTodoId;//이 답글의 부모 Todo의 아이디가 필요하다.
+
+    @NotNull
     private String title;//답글의 내용을 담아야 한다.
 
     public TodoReplyDTO(TodoReplyEntity replyEntity){
