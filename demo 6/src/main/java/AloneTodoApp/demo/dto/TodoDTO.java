@@ -1,5 +1,7 @@
 package AloneTodoApp.demo.dto;
 
+import AloneTodoApp.demo.Exception.AloneTodoAppException;
+import AloneTodoApp.demo.Exception.AloneTodoErrorCode;
 import AloneTodoApp.demo.model.TodoEntity;
 import AloneTodoApp.demo.model.TodoReplyEntity;
 import com.sun.istack.NotNull;
@@ -12,6 +14,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import static AloneTodoApp.demo.Exception.AloneTodoErrorCode.NO_DATE_ENTERED;
 
 @Builder
 @NoArgsConstructor
@@ -46,6 +50,11 @@ public class TodoDTO {
 
     //여기서는 굳이 클라이언트(즉, 사용자)에게 userId 를 보낼 필요가 없기에 .userId(dto.getUserId()); 가 없는 것이다.
     public static TodoEntity toEntity(final TodoDTO dto) {
+
+        if(dto.getDueDate()==null || String.valueOf(dto.getDueDate())==null){
+            throw new AloneTodoAppException(NO_DATE_ENTERED);
+        }
+
         return TodoEntity.builder()
                 .id(dto.getId())
                 .title(dto.getTitle())

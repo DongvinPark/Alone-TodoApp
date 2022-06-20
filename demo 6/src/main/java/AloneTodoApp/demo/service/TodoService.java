@@ -17,8 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static AloneTodoApp.demo.Exception.AloneTodoErrorCode.INVALID_DATE;
-import static AloneTodoApp.demo.Exception.AloneTodoErrorCode.NO_TITLE_ENTERED;
+import static AloneTodoApp.demo.Exception.AloneTodoErrorCode.*;
 
 @Slf4j
 @Service
@@ -104,9 +103,15 @@ public class TodoService {
     //************>>>>>>>>> HELPER METHOD AREA <<<<<<<<<<<************
 
     private void validateDate(TodoEntity todoEntity){
+
+        /*if(todoEntity.getDueDate() == null || String.valueOf(todoEntity.getDueDate()) == null ){
+            throw new AloneTodoAppException(NO_DATE_ENTERED);
+        }*/
+
         if(todoEntity.getDueDate().isBefore(LocalDate.now())){
             throw new AloneTodoAppException(INVALID_DATE);
         }
+
     }//func
 
 
