@@ -1,5 +1,7 @@
 package AloneTodoApp.demo.service;
 
+import AloneTodoApp.demo.Exception.AloneTodoAppException;
+import AloneTodoApp.demo.Exception.AloneTodoErrorCode;
 import AloneTodoApp.demo.dto.TodoDTO;
 import AloneTodoApp.demo.model.TodoEntity;
 import AloneTodoApp.demo.model.TodoReplyEntity;
@@ -11,8 +13,12 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
+import static AloneTodoApp.demo.Exception.AloneTodoErrorCode.INVALID_DATE;
+import static AloneTodoApp.demo.Exception.AloneTodoErrorCode.NO_TITLE_ENTERED;
 
 @Slf4j
 @Service
@@ -39,6 +45,9 @@ public class TodoService {
     @Transactional
     public List<TodoEntity> create(TodoEntity entity) {
 
+        validateEmptyTodoTile(entity);
+        validateDate(entity);
+
         repository.save(entity);
 
         log.info("Entity Id : {} is saved.", entity.getId());
@@ -52,6 +61,9 @@ public class TodoService {
 
     @Transactional
     public List<TodoEntity> update(TodoEntity entity){
+
+        validateEmptyTodoTile(entity);
+        validateDate(entity);
 
         Optional<TodoEntity> original = repository.findById(entity.getId());
 
@@ -91,5 +103,20 @@ public class TodoService {
 
     //************>>>>>>>>> HELPER METHOD AREA <<<<<<<<<<<************
 
+    private void validateDate(TodoEntity todoEntity){
+        if(todoEntity.getDueDate().isBefore(LocalDate.now())){
+            throw new AloneTodoAppException(INVALID_DATE);
+        }
+    }//func
+
+
+
+
+
+    private void validateEmptyTodoTile(TodoEntity todoEntity){
+        if(todoEntity.getTitle().equals("") || todoEntity.getTitle() == null){
+            throw new AloneTodoAppException(NO_TITLE_ENTERED);
+        }
+    }//func
 
 }//end of class
