@@ -265,7 +265,7 @@ public class TodoController {
                     .id(todoEntity.getId())
                     .title(todoEntity.getTitle())
                     .done(todoEntity.isDone())
-                    .isFailed(todoEntity.isFailed())
+                    //.isFailed(todoEntity.isFailed())
                     .replies(new LinkedList<TodoReplyEntity>())
                     .dueDate(String.valueOf(todoEntity.getDueDate()))
                     .build();

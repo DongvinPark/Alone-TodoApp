@@ -35,11 +35,11 @@ public class TodoEntity {
 
     private boolean done;//할 일을 다 마쳤는지 확인한다. 여기가 true되면 isFailed 는 절대로 true 될 수 없다. 이 부분은 별도의 validation 이 필요할 것이다.
 
-    private boolean isFailed;//현재 시각이 dead line 보다 큰 값일 경우 여기가 true되면서 Failed 처리 된다.
+    //private boolean isFailed;//현재 시각이 dead line 보다 큰 값일 경우 여기가 true되면서 Failed 처리 된다.
 
     private LocalDate dueDate;
 
-    @Override
+   /* @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
@@ -50,5 +50,5 @@ public class TodoEntity {
     @Override
     public int hashCode() {
         return getClass().hashCode();
-    }
+    }*/
 }//end of class

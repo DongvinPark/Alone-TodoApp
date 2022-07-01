@@ -30,7 +30,7 @@ public class TodoDTO {
 
     private boolean done;
 
-    private boolean isFailed;
+    //private boolean isFailed;
 
     private List<TodoReplyEntity> replies;
 
@@ -43,7 +43,7 @@ public class TodoDTO {
         this.id = entity.getId();
         this.title = entity.getTitle();
         this.done = entity.isDone();
-        this.isFailed = entity.isFailed();
+        //this.isFailed = entity.isFailed();
         this.replies = new LinkedList<>();
     }
 
@@ -59,7 +59,7 @@ public class TodoDTO {
                 .id(dto.getId())
                 .title(dto.getTitle())
                 .done(dto.isDone())
-                .isFailed(dto.isFailed())
+                //.isFailed(dto.isFailed())
                 .dueDate(LocalDate.parse(dto.getDueDate()))
                 .build();
     }

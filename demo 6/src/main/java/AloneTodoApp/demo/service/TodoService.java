@@ -69,7 +69,7 @@ public class TodoService {
         if(original.isPresent()){
             TodoEntity newEntity = original.get();
             newEntity.setTitle(entity.getTitle());
-            newEntity.setFailed(entity.isFailed());
+            //newEntity.setFailed(entity.isFailed());
             newEntity.setDone(entity.isDone());
             newEntity.setDueDate(entity.getDueDate());
 
