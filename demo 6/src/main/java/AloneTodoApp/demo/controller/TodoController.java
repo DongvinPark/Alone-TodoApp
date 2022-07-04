@@ -91,12 +91,15 @@ public class TodoController {
 
     @PostMapping("/makeReply")
     public ResponseEntity<?> createTodoReply( @RequestBody TodoDTO todoDTO ){
+
+        log.info("makeReply method entered");
+
         try{
             String tempUserId = "temporary-user"; //for TEST
 
-            String title = todoDTO.getReplies().get(todoDTO.getReplies().size()-1).getTitle();
+            //String title = todoDTO.getReplies().get(todoDTO.getReplies().size()-1).getTitle();
 
-            replyService.createReply(tempUserId, todoDTO.getId(), title);
+            replyService.createReply(tempUserId, todoDTO.getId(), "");
 
             return getTodoLists();
         }
@@ -149,6 +152,8 @@ public class TodoController {
         * 프런트 엔드에서 무엇을 입력으로 받아야 하지? 결국 딱 찍어서 수정하고자 하는 TodoReply하나만 있으면 된다.
         * 그래서 최종적으로 무엇을 유저에게 리턴해야 하지? >>> 결과물은 결국 getTodo의 결과물과 일치해야 한다!!
         * */
+
+        log.info("updateReply entered");
 
         try {
             String tempUserId = "temporary-user";

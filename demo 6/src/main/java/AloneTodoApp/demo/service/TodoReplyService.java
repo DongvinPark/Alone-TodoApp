@@ -35,9 +35,12 @@ public class TodoReplyService {
     @Transactional
     public void createReply(String tempUserId, String todoId, String title) {
 
-        if(title.equals("") || title == null){
+        log.info("TodoReplyService.createReply method enter");
+
+        /*if(title.equals("") || title == null){
+            log.warn("no_title_entered");
             throw new AloneTodoAppException(NO_TITLE_ENTERED);
-        }
+        }*/
 
         TodoReplyEntity replyEntity = new TodoReplyEntity(null, tempUserId, todoId, title);
 
@@ -51,11 +54,17 @@ public class TodoReplyService {
     @Transactional
     public List<TodoReplyEntity> updateReply(TodoReplyEntity replyEntity){
 
-        validateEmptyTodoReplyTile(replyEntity);
+        log.info("TodoReplyService.updateReply method entered");
+
+        //validateEmptyTodoReplyTile(replyEntity);
+
+        log.info("replyEntity id : ");
+        log.info(replyEntity.getId());
 
         Optional<TodoReplyEntity> original = replyRepository.findById(replyEntity.getId());
 
         if(original.isPresent()){
+            log.info("updateReply method save part entered");
             TodoReplyEntity newTodoReplyEntity = original.get();
             newTodoReplyEntity.setTitle(replyEntity.getTitle());
             replyRepository.save(newTodoReplyEntity);
