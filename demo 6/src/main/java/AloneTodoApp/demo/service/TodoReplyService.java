@@ -56,7 +56,7 @@ public class TodoReplyService {
 
         log.info("TodoReplyService.updateReply method entered");
 
-        //validateEmptyTodoReplyTile(replyEntity);
+        validateEmptyTodoReplyTile(replyEntity);
 
         log.info("replyEntity id : ");
         log.info(replyEntity.getId());
