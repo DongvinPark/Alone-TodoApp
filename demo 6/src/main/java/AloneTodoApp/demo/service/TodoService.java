@@ -44,6 +44,8 @@ public class TodoService {
     @Transactional
     public List<TodoEntity> create(TodoEntity entity) {
 
+        log.info("투듀서비스 크리에이트 메서드 진입");
+
         validateEmptyTodoTile(entity);
         validateDate(entity);
 

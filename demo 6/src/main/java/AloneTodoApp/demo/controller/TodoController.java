@@ -58,6 +58,9 @@ public class TodoController {
     @PostMapping("/createTodo")
     public ResponseEntity<?> createTodo(@RequestBody TodoDTO todoDTO){
         try{
+
+            log.info("투듀 컨트롤러 크리에이트 투듀 메서드 진입");
+
             String tempUserId = "temporary-user"; //for TEST
 
             TodoEntity entity = TodoDTO.toEntity(todoDTO);
@@ -79,6 +82,7 @@ public class TodoController {
             return ResponseEntity.ok().body(response);
         }//try
         catch (Exception e) {
+            log.info("투듀 컨트롤러 크리에이트 투듀 메서드 캣치 파트 진입");
             String error = e.getMessage();
             ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().error(error).build();
             return ResponseEntity.badRequest().body(response);

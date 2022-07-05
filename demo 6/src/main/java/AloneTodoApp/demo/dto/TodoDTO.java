@@ -25,7 +25,6 @@ public class TodoDTO {
 
     private String id;
 
-    @NotNull
     private String title;
 
     private boolean done;
@@ -36,7 +35,6 @@ public class TodoDTO {
 
 
     //프론트 엔드 쪽에서는 dueDate 부분을 백엔드에 넘겨줄 때, "2022-06-02"와 같은 스트링 타입 리터럴로 보내줘야 한다.
-    @NotNull
     private String dueDate;
 
     public TodoDTO(final TodoEntity entity) {
