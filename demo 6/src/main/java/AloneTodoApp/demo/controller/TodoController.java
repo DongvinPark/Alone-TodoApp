@@ -10,6 +10,7 @@ import AloneTodoApp.demo.service.TodoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -31,13 +32,13 @@ public class TodoController {
 
 
     @GetMapping("/getTodo")
-    public ResponseEntity<?> getTodoLists(){
+    public ResponseEntity<?> getTodoLists(@AuthenticationPrincipal String userId){
 
-        String tempUserId = "temporary-user"; //for TEST
+        //String tempUserId = "temporary-user"; //for TEST
 
-        List<TodoEntity> toDoEntities = service.retrieve(tempUserId);
+        List<TodoEntity> toDoEntities = service.retrieve(userId);
 
-        List<TodoReplyEntity> replyEntities = replyService.retrieveReplies(tempUserId);
+        List<TodoReplyEntity> replyEntities = replyService.retrieveReplies(userId);
         log.info("리플라이엔티티 리스트 길이 보기 : " + replyEntities.size());
         for(TodoReplyEntity ret : replyEntities){
             log.info("리플라이 엔티티들의 parentTodoId 보기 : " + ret.getParentTodoId());
@@ -56,22 +57,22 @@ public class TodoController {
 
 
     @PostMapping("/createTodo")
-    public ResponseEntity<?> createTodo(@RequestBody TodoDTO todoDTO){
+    public ResponseEntity<?> createTodo(@AuthenticationPrincipal String userId , @RequestBody TodoDTO todoDTO){
         try{
 
             log.info("투듀 컨트롤러 크리에이트 투듀 메서드 진입");
 
-            String tempUserId = "temporary-user"; //for TEST
+            //String tempUserId = "temporary-user"; //for TEST
 
             TodoEntity entity = TodoDTO.toEntity(todoDTO);
 
             entity.setId(null);
 
-            entity.setUserId(tempUserId);
+            entity.setUserId(userId);
 
             List<TodoEntity> toDoentities = service.create(entity);
 
-            List<TodoReplyEntity> replyEntities = replyService.retrieveReplies(tempUserId);
+            List<TodoReplyEntity> replyEntities = replyService.retrieveReplies(userId);
 
             List<TodoDTO> dtos = makeDtoListFromEntityList(toDoentities);
 
@@ -94,18 +95,18 @@ public class TodoController {
 
 
     @PostMapping("/makeReply")
-    public ResponseEntity<?> createTodoReply( @RequestBody TodoDTO todoDTO ){
+    public ResponseEntity<?> createTodoReply(@AuthenticationPrincipal String userId , @RequestBody TodoDTO todoDTO ){
 
         log.info("makeReply method entered");
 
         try{
-            String tempUserId = "temporary-user"; //for TEST
+            //String tempUserId = "temporary-user"; //for TEST
 
             //String title = todoDTO.getReplies().get(todoDTO.getReplies().size()-1).getTitle();
 
-            replyService.createReply(tempUserId, todoDTO.getId(), "");
+            replyService.createReply(userId, todoDTO.getId(), "");
 
-            return getTodoLists();
+            return getTodoLists(userId);
         }
         catch (Exception e) {
             String error = e.getMessage();
@@ -118,19 +119,19 @@ public class TodoController {
 
 
     @PutMapping("/updateTodo")
-    public ResponseEntity<?> updateTodo(@RequestBody TodoDTO todoDTO){
+    public ResponseEntity<?> updateTodo(@AuthenticationPrincipal String userId, @RequestBody TodoDTO todoDTO){
         try {
-            String tempUserId = "temporary-user";
+            //String tempUserId = "temporary-user";
 
             TodoEntity todoEntity = TodoDTO.toEntity(todoDTO);
 
-            todoEntity.setUserId(tempUserId);
+            todoEntity.setUserId(userId);
 
             List<TodoEntity> todoEntities = service.update(todoEntity);
 
             List<TodoDTO> dtos = makeDtoListFromEntityList(todoEntities);
 
-            List<TodoReplyEntity> replyEntities = replyService.retrieveReplies(tempUserId);
+            List<TodoReplyEntity> replyEntities = replyService.retrieveReplies(userId);
 
             addReplies(replyEntities, dtos);
 
@@ -149,7 +150,7 @@ public class TodoController {
 
 
     @PutMapping("/updateReply")
-    public ResponseEntity<?> updateReply(@RequestBody TodoReplyDTO todoReplyDTO){
+    public ResponseEntity<?> updateReply(@AuthenticationPrincipal String userId, @RequestBody TodoReplyDTO todoReplyDTO){
 
         /*
         * 로직을 좀 세워보자. 이놈은 특정한 Todo 튜플 하나에 존재하는 TodoReply 항목중 하나만을 딱 찍어서 타이틀을 수정하는 것이다.
@@ -160,15 +161,15 @@ public class TodoController {
         log.info("updateReply entered");
 
         try {
-            String tempUserId = "temporary-user";
+            //String tempUserId = "temporary-user";
 
             TodoReplyEntity replyEntity = TodoReplyDTO.toEntity(todoReplyDTO);
 
-            replyEntity.setUserId(tempUserId);
+            replyEntity.setUserId(userId);
 
             List<TodoReplyEntity> listOfRepliesAfterUpdate = replyService.updateReply(replyEntity);
 
-            List<TodoEntity> todoEntities = service.retrieve(tempUserId);
+            List<TodoEntity> todoEntities = service.retrieve(userId);
 
             List<TodoDTO> dtos = makeDtoListFromEntityList(todoEntities);
 
@@ -191,19 +192,19 @@ public class TodoController {
     //Todo 아이템이 사라지면, 그 아이템 밑에 존재하던 리플라이들도 전부 없애야 한다!!
     //이것을 구현하는 로직을 Todo Service 계층의 delete 메서드에서 구현해야 한다.
     @DeleteMapping("/deleteTodo")
-    public ResponseEntity<?> deleteTodo(@RequestBody TodoDTO todoDTO){
+    public ResponseEntity<?> deleteTodo(@AuthenticationPrincipal String userId, @RequestBody TodoDTO todoDTO){
 
-        String tempUserId = "temporary-user";
+        //String tempUserId = "temporary-user";
 
         TodoEntity todoEntity = TodoDTO.toEntity(todoDTO);
 
-        todoEntity.setUserId(tempUserId);
+        todoEntity.setUserId(userId);
 
         List<TodoEntity> todoEntities = service.delete(todoEntity, todoDTO);
 
         List<TodoDTO> dtos = makeDtoListFromEntityList(todoEntities);
 
-        List<TodoReplyEntity> replyEntities = replyService.retrieveReplies(tempUserId);
+        List<TodoReplyEntity> replyEntities = replyService.retrieveReplies(userId);
 
         addReplies(replyEntities, dtos);
 
@@ -217,17 +218,17 @@ public class TodoController {
 
     //이놈은 특정한 Todo 아이템에 속해 있는 특정한 리플라이 하나를 골라서 삭제하는 것이다.
     @DeleteMapping("/deleteReply")
-    public ResponseEntity<?> deleteReply(@RequestBody TodoReplyDTO todoReplyDTO){
+    public ResponseEntity<?> deleteReply(@AuthenticationPrincipal String userId, @RequestBody TodoReplyDTO todoReplyDTO){
 
-        String tempUserId = "temporary-user";
+        //String tempUserId = "temporary-user";
 
         TodoReplyEntity replyEntity = TodoReplyDTO.toEntity(todoReplyDTO);
 
-        replyEntity.setUserId(tempUserId);
+        replyEntity.setUserId(userId);
 
         List<TodoReplyEntity> listOfRepliesAfterDelete = replyService.deleteReply(replyEntity);
 
-        List<TodoEntity> todoEntities = service.retrieve(tempUserId);
+        List<TodoEntity> todoEntities = service.retrieve(userId);
 
         List<TodoDTO> dtos = makeDtoListFromEntityList(todoEntities);
 
