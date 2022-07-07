@@ -79,7 +79,7 @@ public class UserController {
         }//if
         else {
             ResponseDTO responseDTO = ResponseDTO.builder()
-                    .error("Login failed")
+                    .error("회원가입 되지 않은 사용자입니다...")
                     .build();
 
             return ResponseEntity
